@@ -53,7 +53,7 @@ class Client(object):
 
     def encrypt_DP(self, sub_set):
         sensitivety = 1
-        epsilon = 1
+        epsilon = 0.5
         if sub_set not in self.support_data:
             data = 0
             for t in self.train_dataset:
@@ -63,7 +63,7 @@ class Client(object):
             data = self.support_data[sub_set]
         encrypted_data = laplace_mech(data, sensitivety, epsilon)
         if sub_set == frozenset({'root vegetables', 'yogurt'}):
-            print(data,encrypted_data)
+            print(data, encrypted_data)
         return encrypted_data
 
     def value(self, sub_set):

@@ -51,15 +51,18 @@ for c in clients:
 server.threshold()  # 阈值初值确定
 
 
-# value_frequent_itemset = []
-# for candidate_frequent in server.candidate_frequent_itemset:
-#     value_support_data = 0
-#     for c in clients:
-#         value_support_data += c.value(candidate_frequent[0])
-#     if value_support_data >= (min_support * length):
-#         value_frequent_itemset.append(candidate_frequent[0])
-# end_time = time.time()
-# print("耗时: {:.2f}秒".format(end_time - start_time))
+pailliar_frequent_itemset = []
+for candidate_frequent in server.candidate_frequent_itemset:
+    pailliar_support_data = 0
+    for c in clients:
+        pailliar_support_data += c.encrypt_HE(candidate_frequent[0], public_key)
+    decrypt_pailliar_support_data = private_key.decrypt(pailliar_support_data)
+    if decrypt_pailliar_support_data >= (min_support * length):
+        pailliar_frequent_itemset.append(candidate_frequent[0])
+print(pailliar_frequent_itemset)
+
+end_time = time.time()
+print("耗时: {:.2f}秒".format(end_time - start_time))
 # 下界
 while(1):
     random_list = server.random_sample(round(server.X - 0.1, 4), server.X)
@@ -161,24 +164,35 @@ for final_frequent_item in final_frequent_itemset:
      if final_frequent_itemset[final_frequent_item] >= (min_support * length):
         Global_frequent_itemset.append(final_frequent_item)
 
-end_time = time.time()
-print("耗时: {:.2f}秒".format(end_time - start_time))
+# end_time = time.time()
+# print("耗时: {:.2f}秒".format(end_time - start_time))
 
 value_frequent_itemset = []
 for candidate_frequent in server.candidate_frequent_itemset:
     value_support_data = 0
     for c in clients:
+        # value_support_data += c.encrypt_DP(candidate_frequent[0])
         value_support_data += c.value(candidate_frequent[0])
     if value_support_data >= (min_support * length):
         value_frequent_itemset.append(candidate_frequent[0])
 
+DP_frequent_itemset = []
+for candidate_frequent in server.candidate_frequent_itemset:
+    DP_support_data = 0
+    for c in clients:
+        DP_support_data += c.encrypt_DP(candidate_frequent[0])
+        # value_support_data += c.value(candidate_frequent[0])
+    if DP_support_data >= (min_support * length):
+        DP_frequent_itemset.append(candidate_frequent[0])
+
 
 print(Global_frequent_itemset)
 print(value_frequent_itemset)
-
+print(DP_frequent_itemset)
 # 计算相似度
 similarity = server.get_Jaccard(Global_frequent_itemset, value_frequent_itemset)
-print(similarity)
+DP_similarity = server.get_Jaccard(DP_frequent_itemset,value_frequent_itemset)
+print(similarity, DP_similarity)
 
 
 
